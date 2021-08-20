@@ -1,6 +1,7 @@
-package java.com.shadowgunther.util;
+package com.shadowgunther.util;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ThreadWriter extends Thread{
     private CSVWriter writer = null;
@@ -34,6 +35,12 @@ public class ThreadWriter extends Thread{
 
     @Override
     public void run() {
+        try {
+            writer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         if (!writer.isOpen() && (!dumper.isStop() || dumper.hasData())) {
             return;
         }
@@ -54,5 +61,6 @@ public class ThreadWriter extends Thread{
                 online = false;
             }
         }
+        writer.close();
     }
 }

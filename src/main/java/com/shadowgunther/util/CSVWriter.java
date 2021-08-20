@@ -1,4 +1,4 @@
-package java.com.shadowgunther.util;
+package com.shadowgunther.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -77,12 +77,18 @@ public class CSVWriter {
         bufferedWriter = new BufferedWriter(new FileWriter(reference, false));
     }
 
-    public void close() throws IOException {
+    public void close() {
         if(isOpen)
         {
-            bufferedWriter.close();
-            bufferedWriter = null;
-            isOpen = false;
+            try {
+                bufferedWriter.flush();
+                bufferedWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                bufferedWriter = null;
+                isOpen = false;
+            }
         }
     }
 

@@ -31,4 +31,9 @@ public class DeviceInfo {
     public DeviceClass getDeviceClass() {
         return deviceClass;
     }
+
+    @Override
+    public String toString() {
+        return "Device Name: " + name + " ; MAC: " + remoteDevice.getBluetoothAddress();
+    }
 }

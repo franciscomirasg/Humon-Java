@@ -1,4 +1,4 @@
-package java.com.shadowgunther.util;
+package com.shadowgunther.util;
 
 import java.util.Map;
 
