@@ -1,6 +1,4 @@
-package com.shadowgunther.gui;
-
-import com.shadowgunther.Controller;
+package es.shadowgunther.gui;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

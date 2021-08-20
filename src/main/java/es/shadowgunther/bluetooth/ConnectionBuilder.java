@@ -1,4 +1,4 @@
-package com.shadowgunther.bluetooth;
+package es.shadowgunther.bluetooth;
 
 import javax.bluetooth.RemoteDevice;
 

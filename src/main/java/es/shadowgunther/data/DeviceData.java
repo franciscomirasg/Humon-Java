@@ -1,4 +1,4 @@
-package com.shadowgunther.data;
+package es.shadowgunther.data;
 
 public class DeviceData {
     private final String RA;

@@ -1,4 +1,4 @@
-package com.shadowgunther.util;
+package es.shadowgunther.util;
 
 import java.io.File;
 import java.io.IOException;

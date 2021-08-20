@@ -1,6 +1,6 @@
-package com.shadowgunther.bluetooth;
+package es.shadowgunther.bluetooth;
 
-import com.shadowgunther.Main;
+import es.shadowgunther.Main;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;

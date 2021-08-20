@@ -1,4 +1,4 @@
-package com.shadowgunther;
+package es.shadowgunther;
 
 public class Controller {
     private static Controller INSTANCE;

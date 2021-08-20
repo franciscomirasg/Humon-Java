@@ -1,6 +1,6 @@
-package com.shadowgunther.util;
+package es.shadowgunther.util;
 
-import com.shadowgunther.data.DeviceData;
+import es.shadowgunther.data.DeviceData;
 
 public interface DeviceObserver {
     public void notifyDevice(DeviceData data);

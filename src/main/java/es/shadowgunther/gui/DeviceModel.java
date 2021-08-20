@@ -1,6 +1,6 @@
-package com.shadowgunther.gui;
+package es.shadowgunther.gui;
 
-import com.shadowgunther.bluetooth.DeviceInfo;
+import es.shadowgunther.bluetooth.DeviceInfo;
 
 import javax.swing.*;
 import javax.swing.event.ListDataListener;

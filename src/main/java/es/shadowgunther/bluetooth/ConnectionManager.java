@@ -1,8 +1,8 @@
-package com.shadowgunther.bluetooth;
+package es.shadowgunther.bluetooth;
 
-import com.shadowgunther.data.DeviceData;
-import com.shadowgunther.util.DeviceObserver;
-import com.shadowgunther.util.ObservableDevice;
+import es.shadowgunther.data.DeviceData;
+import es.shadowgunther.util.DeviceObserver;
+import es.shadowgunther.util.ObservableDevice;
 
 import javax.microedition.io.StreamConnection;
 import java.io.*;

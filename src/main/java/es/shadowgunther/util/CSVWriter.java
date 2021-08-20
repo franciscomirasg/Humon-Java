@@ -1,4 +1,4 @@
-package com.shadowgunther.util;
+package es.shadowgunther.util;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.shadowgunther;
+package es.shadowgunther;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.LocalDevice;
