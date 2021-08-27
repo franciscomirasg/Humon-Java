@@ -12,6 +12,7 @@ public class CSVWriter {
     private File reference;
     private boolean isOpen;
     private String rowSeperator = ",";
+    private String delimiter = "\"";
 
     public CSVWriter(){};
 
@@ -43,11 +44,21 @@ public class CSVWriter {
     }
 
     public void setRowSeperator(String rowSeperator) {
+        isOpen = true;
         this.rowSeperator = rowSeperator;
     }
 
+    public String getDelimiter() {
+        return delimiter;
+    }
+
+    public void setDelimiter(String delimiter) {
+        isOpen = true;
+        this.delimiter = delimiter;
+    }
+
     public void start() throws IOException {
-        if(isOpen) return;
+        isOpen = true;
         //Existe el fichero
         if (!reference.exists()) {
             boolean result = true;
@@ -75,6 +86,7 @@ public class CSVWriter {
         }
 
         bufferedWriter = new BufferedWriter(new FileWriter(reference, false));
+        isOpen = true;
     }
 
     public void close() {
@@ -95,7 +107,7 @@ public class CSVWriter {
     public void write(String ... head)
     {
         if(! isOpen) return;
-        StringJoiner joiner = new StringJoiner(rowSeperator);
+        StringJoiner joiner = new StringJoiner(rowSeperator, delimiter, delimiter);
         Arrays.stream(head).forEach(joiner::add);
         try {
             bufferedWriter.write(joiner.toString());

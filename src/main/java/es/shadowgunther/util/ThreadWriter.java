@@ -1,32 +1,44 @@
 package es.shadowgunther.util;
 
+import es.shadowgunther.data.DeviceData;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class ThreadWriter extends Thread{
-    private CSVWriter writer = null;
-    private CSVDumper dumper;
+public class ThreadWriter extends Thread implements  DeviceObserver{
+    private CSVWriter writer;
     private volatile boolean online;
-    private final static int wait_time;
-    private volatile int timeout;
+    private volatile boolean stopped;
+    private final Queue<DeviceData> queue;
+    private volatile Lock lock;
+    private final static String[] HEADER;
+    private final static int TIMEOUT;
 
     static {
-        wait_time = 1000;
+        HEADER = new String[]{"1R", "2R", "3R", "1IR", "2IR", "3IR"};
+        TIMEOUT = 5000;
     }
 
-    public ThreadWriter()
+    public ThreadWriter( CSVWriter writer)
     {
-        writer = new CSVWriter();
+        this.writer = writer;
         online = false;
+        queue = new LinkedList<>();
+        lock = new ReentrantLock();
+        stopped = true;
     }
 
-    public void setFile(File file)
-    {
-        this.writer.setFile(file);
+
+    public boolean isStopped() {
+        return stopped;
     }
 
-    public void setDumper(CSVDumper dumper) {
-        this.dumper = dumper;
+    public void setStopped(boolean stopped) {
+        this.stopped = stopped;
     }
 
     public boolean isFinish() {
@@ -41,26 +53,40 @@ public class ThreadWriter extends Thread{
             e.printStackTrace();
             return;
         }
-        if (!writer.isOpen() && (!dumper.isStop() || dumper.hasData())) {
+        if (!writer.isOpen() ) {
             return;
         }
-        if (dumper.isHead()) writer.write(dumper.getHeads());
+        writer.write(HEADER);
+        online = true;
         while (online) {
-            if (dumper.hasData()) {
-                writer.write(dumper.entryToString());
+            if (!queue.isEmpty()) {
+                writer.write(queue.poll().getArray());
             } else {
-                if (!dumper.hasData() && !dumper.isStop()) {
-                    try {
-                        sleep(wait_time);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                if(!isStopped())
+                {
+                    synchronized (lock)
+                    {
+                        try {
+                            lock.wait(TIMEOUT);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
-            if (dumper.isStop() && !dumper.hasData()) {
+            if (stopped && queue.isEmpty()) {
                 online = false;
             }
         }
         writer.close();
+    }
+
+    @Override
+    public void notifyDevice(DeviceData data) {
+        queue.add(data);
+        synchronized (lock)
+        {
+            lock.notify();
+        }
     }
 }
