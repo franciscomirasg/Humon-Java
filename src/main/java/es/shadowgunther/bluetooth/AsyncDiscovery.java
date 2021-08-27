@@ -1,6 +1,6 @@
 package es.shadowgunther.bluetooth;
 
-import es.shadowgunther.Main;
+import es.shadowgunther.Controller;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DiscoveryAgent;
@@ -51,7 +51,7 @@ public class AsyncDiscovery extends Thread{
         {
             case 1:
                 try {
-                    DiscoveryAgent agent = Main.getInstance().getLocal().getDiscoveryAgent();
+                    DiscoveryAgent agent = Controller.getINSTANCE().getLocal().getDiscoveryAgent();
 
                     agent.startInquiry(DiscoveryAgent.GIAC, discovery);
                 } catch (BluetoothStateException e) {
@@ -59,7 +59,7 @@ public class AsyncDiscovery extends Thread{
                 }
                 break;
             case 2:
-                DiscoveryAgent agent = Main.getInstance().getLocal().getDiscoveryAgent();
+                DiscoveryAgent agent = Controller.getINSTANCE().getLocal().getDiscoveryAgent();
                 UUID[] set = new UUID[1];
                 set[0] = new UUID(0x1101);
                 try {

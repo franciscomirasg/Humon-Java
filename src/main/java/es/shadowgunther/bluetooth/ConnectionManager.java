@@ -17,6 +17,7 @@ public class ConnectionManager extends Thread implements ObservableDevice {
     private DataInputStream dataInputStream;
     private BufferedReader bufferedReader;
     private DeviceInfo device;
+    private volatile boolean control;
     private static final byte[] start;
     private static final byte[] stop;
     private static final String RA;
@@ -40,6 +41,7 @@ public class ConnectionManager extends Thread implements ObservableDevice {
 
     public ConnectionManager(StreamConnection connection, DeviceInfo device) throws IOException
     {
+        control = false;
         this.connection = connection;
         this.device = device;
         this.dataInputStream = this.connection.openDataInputStream();
@@ -48,11 +50,16 @@ public class ConnectionManager extends Thread implements ObservableDevice {
         this.observers = new LinkedList<>();
     }
 
+    public boolean isControl() {
+        return control;
+    }
+
     public void startDevice()
     {
         try {
             this.dataOutputStream.write(start);
             this.dataOutputStream.flush();
+            control = true;
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -67,6 +74,8 @@ public class ConnectionManager extends Thread implements ObservableDevice {
         } catch (IOException e)
         {
             e.printStackTrace();
+        } finally {
+            control = false;
         }
     }
 
@@ -85,6 +94,7 @@ public class ConnectionManager extends Thread implements ObservableDevice {
 
     @Override
     public void registerListener(DeviceObserver observer) {
+        if(observers.contains(observer)) return;
         observers.add(observer);
     }
 
@@ -103,19 +113,19 @@ public class ConnectionManager extends Thread implements ObservableDevice {
         System.out.println("Prototype Manager Online");
         startDevice();
         String ra = null,rb = null,rc = null,ira = null,irb = null,irc = null;
-        while (connection != null)
+        while (connection != null && control)
         {
+            if(connection == null) continue;
             try {
                 String recived = bufferedReader.readLine();
-                System.out.println(recived);
                 if(ra != null && rb != null && rc != null &&
                         ira != null && irb != null && irc != null
                         )
                 {
-                    System.out.println(new StringJoiner(" ").add(ra).add(rb).add(rc)
-                            .add(ira).add(irb).add(irc).toString());
                     DeviceData a = new DeviceData(ra, rb, rc, ira, irb, irc);
                     notifyObservers(a);
+                    System.out.println(new StringJoiner(" ").add(ra).add(rb).add(rc)
+                            .add(ira).add(irb).add(irc).toString());
                     ra = null;
                     rb = null;
                     rc = null;

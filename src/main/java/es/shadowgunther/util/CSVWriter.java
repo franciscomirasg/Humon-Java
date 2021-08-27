@@ -14,11 +14,12 @@ public class CSVWriter {
     private String rowSeperator = ",";
     private String delimiter = "\"";
 
-    public CSVWriter(){};
+    public CSVWriter(){
+        isOpen = false;
+    };
 
     public CSVWriter(File file) {
         this.reference = file;
-        isOpen = false;
     }
 
     public CSVWriter(String file) {

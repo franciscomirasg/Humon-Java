@@ -51,6 +51,7 @@ public class SelectDevice extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        pack();
     }
 
     public DeviceInfo getSelected()
@@ -68,10 +69,4 @@ public class SelectDevice extends JDialog {
         dispose();
     }
 
-    public SelectDevice ready(List<DeviceInfo> devices)
-    {
-        SelectDevice result = new SelectDevice(devices);
-        result.pack();
-        return result;
-    }
 }

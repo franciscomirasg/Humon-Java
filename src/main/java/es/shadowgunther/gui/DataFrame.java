@@ -1,10 +1,17 @@
 package es.shadowgunther.gui;
 
+import es.shadowgunther.Controller;
+import es.shadowgunther.bluetooth.DeviceInfo;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-public class DataFrame {
+public class DataFrame extends JFrame {
     private JPanel panel1;
     private JButton btnSearch;
     private JButton btn_iniciar;
@@ -31,6 +38,90 @@ public class DataFrame {
     private JTextField valInfra_b;
     private JTextField valInfra_c;
 
+
+
+
+    //TASKS
+
+    private PoolingTask poolingTask;
+
+
+
+    class animationTask extends SwingWorker<Void, Void> {
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            progressBar.setIndeterminate(true);
+            setProgressBar(true);
+            Controller.getINSTANCE().searchDevices();
+            setProgressBar(false);
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            showDiscoveries(Controller.getINSTANCE().getDevices());
+            super.done();
+        }
+    }
+
+    private void onCancel()
+    {
+        Controller.getINSTANCE().closeAll();
+    }
+
+    public void startClose()
+    {
+        poolingTask.stopPooling();
+        dispose();
+    }
+
+    public void showDiscoveries(List<DeviceInfo> devices)
+    {
+        SelectDevice selectDevice = new SelectDevice(devices);
+        selectDevice.setVisible(true);
+        if(selectDevice.getSelected() != null)
+        {
+            Controller.getINSTANCE().selectDevice(selectDevice.getSelected());
+            searchOk();
+        } else {
+            btnSearch.setEnabled(true);
+        }
+
+    }
+
+    public void setProgressBar(boolean visible)
+    {
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisible(visible);
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public DataFrame()
+    {
+        poolingTask = new PoolingTask(valRed_a, valRed_b, valRed_c, valInfra_a, valInfra_b, valInfra_c);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                onCancel();
+            }
+        });
+    }
+
+    public void setDeviceInfo(DeviceInfo info)
+    {
+        label_d_name.setText(info.getName());
+        label_adr_dvice.setText(info.getAdress());
+        panel_devide_info.repaint();
+    }
 
 
 
@@ -62,6 +153,8 @@ public class DataFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Search");
+                btnSearch.setEnabled(false);
+                (new animationTask()).execute();
             }
         });
         //Start button
@@ -69,8 +162,12 @@ public class DataFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Iniciar");
+                if(!Controller.getINSTANCE().newFile()) return;
                 btn_iniciar.setEnabled(false);
                 btn_detener.setEnabled(true);
+                Controller.getINSTANCE().addObserver(poolingTask);
+                Controller.getINSTANCE().iniciar();
+                poolingTask.execute();
             }
         });
         //Detener button
@@ -80,7 +177,18 @@ public class DataFrame {
                 System.out.println("Detener");
                 btn_iniciar.setEnabled(true);
                 btn_detener.setEnabled(false);
+                Controller.getINSTANCE().detener();
+                poolingTask.stopPooling();
             }
         });
+    }
+
+
+    public void lock() {
+        panel1.setEnabled(false);
+        panel_devide_info.setEnabled(false);
+        panel_btn.setEnabled(false);
+        infoPanel.setEnabled(false);
+        panel_data.setEnabled(false);
     }
 }
