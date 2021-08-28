@@ -4,6 +4,7 @@ import es.shadowgunther.Controller;
 import es.shadowgunther.bluetooth.DeviceInfo;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -37,6 +38,7 @@ public class DataFrame extends JFrame {
     private JTextField valInfra_a;
     private JTextField valInfra_b;
     private JTextField valInfra_c;
+    private final DataFrame instanceGUI;
 
 
 
@@ -53,8 +55,12 @@ public class DataFrame extends JFrame {
         protected Void doInBackground() throws Exception {
             progressBar.setIndeterminate(true);
             setProgressBar(true);
+            lock(false);
+            instanceGUI.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             Controller.getINSTANCE().searchDevices();
             setProgressBar(false);
+            instanceGUI.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            lock(true);
             return null;
         }
 
@@ -107,7 +113,7 @@ public class DataFrame extends JFrame {
 
     public DataFrame()
     {
-        poolingTask = new PoolingTask(valRed_a, valRed_b, valRed_c, valInfra_a, valInfra_b, valInfra_c);
+        super("Lector Prototipo");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -115,8 +121,11 @@ public class DataFrame extends JFrame {
             }
         });
         setContentPane(panel1);
-        createUIComponents();
+        initBtn();
+        poolingTask = new PoolingTask(valRed_a, valRed_b, valRed_c, valInfra_a, valInfra_b, valInfra_c);
+        setProgressBar(false);
         pack();
+        this.instanceGUI = this;
     }
 
     public void setDeviceInfo(DeviceInfo info)
@@ -150,7 +159,7 @@ public class DataFrame extends JFrame {
         panel1.repaint();
     }
 
-    private void createUIComponents() {
+    private void initBtn() {
         //Search button
         btnSearch.addActionListener(new ActionListener() {
             @Override
@@ -187,11 +196,11 @@ public class DataFrame extends JFrame {
     }
 
 
-    public void lock() {
-        panel1.setEnabled(false);
-        panel_devide_info.setEnabled(false);
-        panel_btn.setEnabled(false);
-        infoPanel.setEnabled(false);
-        panel_data.setEnabled(false);
+    public void lock(boolean visible) {
+        panel1.setEnabled(visible);
+        panel_devide_info.setEnabled(visible);
+        panel_btn.setEnabled(visible);
+        infoPanel.setEnabled(visible);
+        panel_data.setEnabled(visible);
     }
 }

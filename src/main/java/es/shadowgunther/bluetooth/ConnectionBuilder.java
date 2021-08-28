@@ -8,13 +8,14 @@ public class ConnectionBuilder {
     private static final String sc;
 
     static {
-        bluetoothURL = "btspp://<mac>:<sc>;authenticate=false;encrypt=false;master=false";
+        bluetoothURL = "btspp://<mac>:<sc>";
         mac = "<mac>";
         sc = "<sc>";
     }
 
     public static String getConnectionURL(RemoteDevice device, int service)
     {
+        System.out.println(bluetoothURL.replace(mac, device.getBluetoothAddress()).replace(sc, Integer.toString(service)));
         return bluetoothURL.replace(mac, device.getBluetoothAddress()).replace(sc, Integer.toString(service));
     }
 }

@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class Controller{
+public class Controller extends Thread{
     private volatile static Controller INSTANCE;
     private final ThreadWriter writer;
     private final CSVWriter writerModule;
@@ -31,9 +31,17 @@ public class Controller{
     private LocalDevice local;
     public boolean OK;
     private final DataFrame frame;
+    private volatile boolean online;
 
     static {
         dateFormat = new SimpleDateFormat("dd-MM-yyyy hh_mm_ss");
+    }
+
+    @Override
+    public void run() {
+        online=true;
+        setVisible();
+        while (online){};
     }
 
     private Controller()
@@ -55,11 +63,17 @@ public class Controller{
         //Iniciar lector
         writerModule = new CSVWriter();
         writer = new ThreadWriter(writerModule);
+        OK = true;
     }
 
-    public void setVisible(boolean visible)
+    public void setVisible()
     {
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                frame.setVisible(true);
+            }
+        });
     }
 
     public List<DeviceInfo> searchDevices()
@@ -107,7 +121,7 @@ public class Controller{
     public void selectDevice(DeviceInfo deviceInfo)
     {
         try {
-            StreamConnection connection = (StreamConnection) Connector.open(ConnectionBuilder.getConnectionURL(deviceInfo.getRemoteDevice(), 1));
+            StreamConnection connection = (StreamConnection) Connector.open(ConnectionBuilder.getConnectionURL(deviceInfo.getRemoteDevice(), 1), 3);
             deviceConnection = new ConnectionManager(connection, deviceInfo);
             frame.setDeviceInfo(deviceInfo);
             deviceConnection.registerListener(writer);
@@ -131,8 +145,9 @@ public class Controller{
 
     public void closeAll()
     {
-        frame.lock();
-        deviceConnection.disconnect();
+        frame.lock(false);
+        if(deviceConnection != null) deviceConnection.disconnect();
+
         writer.setStopped(true);
         try {
             writer.join();
@@ -140,19 +155,31 @@ public class Controller{
             e.printStackTrace();
         }
         frame.startClose();
+        online=false;
     }
 
     public static Controller getINSTANCE() {
-        return INSTANCE;
+        Controller aux = INSTANCE;
+        if(aux !=  null) return INSTANCE;
+        synchronized (Controller.class)
+        {
+            if(INSTANCE == null)
+            {
+                INSTANCE = new Controller();
+            }
+            return INSTANCE;
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Controller instance = getINSTANCE();
-        if(!instance.OK)
+        Controller alpha = getINSTANCE();
+        if(!alpha.OK)
         {
+            alpha.closeAll();
             return;
         }
-        instance.setVisible(true);
+        alpha.run();
+        alpha.join();
 
     }
 }

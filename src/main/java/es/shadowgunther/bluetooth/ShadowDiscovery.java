@@ -28,10 +28,14 @@ public class ShadowDiscovery implements DiscoveryListener {
         return Collections.unmodifiableList(devicesList);
     }
 
+    public void resetList()
+    {
+        devicesList.clear();
+    }
+
     @Override
     public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass)
     {
-        devicesList.clear();
         String name;
         try {
             name = remoteDevice.getFriendlyName(false);

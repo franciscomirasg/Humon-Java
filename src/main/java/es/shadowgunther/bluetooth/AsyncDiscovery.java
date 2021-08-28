@@ -47,6 +47,7 @@ public class AsyncDiscovery extends Thread{
 
     @Override
     public void run() {
+        discovery.resetList();
         switch (mode)
         {
             case 1:
