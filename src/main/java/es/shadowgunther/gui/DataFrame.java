@@ -114,6 +114,9 @@ public class DataFrame extends JFrame {
                 onCancel();
             }
         });
+        setContentPane(panel1);
+        createUIComponents();
+        pack();
     }
 
     public void setDeviceInfo(DeviceInfo info)

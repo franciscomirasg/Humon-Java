@@ -50,11 +50,16 @@ public class Controller{
         discovery = new AsyncDiscovery();
 
         //Iniciar interaz
-        frame = new DataFrame();//TODO
+        frame = new DataFrame();
 
         //Iniciar lector
         writerModule = new CSVWriter();
         writer = new ThreadWriter(writerModule);
+    }
+
+    public void setVisible(boolean visible)
+    {
+        frame.setVisible(true);
     }
 
     public List<DeviceInfo> searchDevices()
@@ -147,5 +152,7 @@ public class Controller{
         {
             return;
         }
+        instance.setVisible(true);
+
     }
 }
